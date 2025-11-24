@@ -25,15 +25,17 @@
     transform: scale(0.95);
 }
 
-/* 弹窗容器样式 - 375x667 */
+/* 弹窗容器样式 - 自适应尺寸，匹配网站期望的尺寸 */
 #floating-webview-container {
     display: none; /* 默认隐藏 */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 375px;  /* 修正宽度 */
-    height: 667px; /* 修正高度 */
+    width: 390px;  /* 匹配网站默认宽度 */
+    height: 844px; /* 匹配网站默认高度 */
+    max-width: 90vw;  /* 响应式：最大不超过视口宽度的90% */
+    max-height: 90vh; /* 响应式：最大不超过视口高度的90% */
     background: transparent;
     /* 去掉明显的边框，显得更干净，或者保留细微边框 */
     /* border: 1px solid #444; */
@@ -43,13 +45,32 @@
     border-radius: 15px; /* 窗口也加点圆角 */
 }
 
-/* iframe 填满容器 */
+/* iframe 填满容器，使用缩放确保内容填满 */
 #floating-webview-iframe {
     width: 100%;
     height: 100%;
     border: none;
     background: #fff;
     pointer-events: auto;
+    /* 确保iframe内容能够正确显示 */
+    display: block;
+    /* 移除默认的iframe间距 */
+    margin: 0;
+    padding: 0;
+    /* 确保iframe内容能够填满容器 */
+    object-fit: fill;
+    /* 移除iframe的默认缩放限制 */
+    zoom: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+/* 如果iframe内容无法填满，尝试通过CSS注入来调整 */
+/* 注意：这需要iframe内容允许样式注入，或者通过JavaScript动态注入 */
+#floating-webview-container iframe {
+    /* 确保iframe本身填满容器 */
+    min-width: 100%;
+    min-height: 100%;
 }
 
 /* 全屏遮罩层：用于点击外部关闭 */
