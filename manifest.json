@@ -1,9 +1,12 @@
 {
+    "display_name": "Pixel Pet",
     "name": "Pixel Pet",
     "version": "1.0.0",
     "author": "DC熙",
     "description": "A floating pixel pet webview.",
     "repo": "https://github.com/yyyy5s/pkmXXXST",
+    "js": "index.js",
+    "css": "style.css",
     "loading_order": 9999,
     "requires": []
 }
