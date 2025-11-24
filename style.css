@@ -1,16 +1,22 @@
+/* 悬浮球样式 */
 #floating-webview-ball {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
-    /* 你可以在这里加 background-image: url('你的图片链接'); 来替换纯色背景 */
-    background: radial-gradient(circle at 30% 30%, #4facfe, #00f2fe);
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    width: 45px;  /* 稍微改小了一点 (原50) */
+    height: 45px;
+    /* 你的图片直链 */
+    background-image: url('https://raw.githubusercontent.com/yyyy5s/pkmXXXX/39fda8ff4519b6b570b9fd2696e67ad21cae730b/assets/icon.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* 圆角，不是纯圆 */
+    border-radius: 12px; 
+    /* 一点点阴影 */
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
     cursor: grab;
     z-index: 20000;
-    transition: transform 0.1s;
+    transition: transform 0.1s, opacity 0.3s;
     user-select: none;
 }
 
@@ -19,47 +25,41 @@
     transform: scale(0.95);
 }
 
+/* 弹窗容器样式 - 375x667 */
 #floating-webview-container {
-    display: none;
+    display: none; /* 默认隐藏 */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 390px;
-    height: 844px;
-    background: #000;
-    border: 2px solid #4facfe;
-    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    width: 375px;  /* 修正宽度 */
+    height: 667px; /* 修正高度 */
+    background: transparent;
+    /* 去掉明显的边框，显得更干净，或者保留细微边框 */
+    /* border: 1px solid #444; */
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
     z-index: 20001;
-    flex-direction: column;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 15px; /* 窗口也加点圆角 */
 }
 
-#floating-webview-header {
-    height: 30px;
-    background: #222;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 0 10px;
-    cursor: default;
-}
-
-#floating-webview-close {
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: sans-serif;
-}
-
-#floating-webview-close:hover {
-    color: #ff4d4d;
-}
-
+/* iframe 填满容器 */
 #floating-webview-iframe {
-    width: 390px;
-    height: 814px;
+    width: 100%;
+    height: 100%;
     border: none;
     background: #fff;
+    pointer-events: auto;
+}
+
+/* 全屏遮罩层：用于点击外部关闭 */
+#floating-webview-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20000; /* 比容器低，比页面高 */
+    background: transparent; /* 透明，或者改成 rgba(0,0,0,0.3) 变暗 */
 }
