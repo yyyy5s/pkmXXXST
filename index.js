@@ -6,107 +6,119 @@ jQuery(document).ready(function () {
     const TARGET_URL = "https://yyyy5s.github.io/pkmXXXX/";
     
     // ============================
-    // 0. 自动创建 QR 按钮 (核心新增)
+    // 0. 在设置面板添加按钮
     // ============================
-    const QR_SET_NAME = "Pixel Pet";
-    const QR_BUTTON_LABEL = "召唤宠物";
-    
-    // 创建QR按钮的函数 - 尝试多种方法
-    function createQRButton() {
-        console.log('Attempting to create QR button...');
-        console.log('Available objects:', {
-            slash_commands: !!window.slash_commands,
-            quickReplyManager: !!window.quickReplyManager,
-            quick_reply_manager: !!window.quick_reply_manager,
-            eventSource: !!window.eventSource
-        });
+    function addSettingsButton() {
+        // 等待ST界面加载完成
+        function tryAddButton() {
+            // 尝试找到设置面板 - 常见的选择器
+            const settingsSelectors = [
+                '#settings_panel',
+                '.settings_panel',
+                '#right_panel',
+                '.right_panel',
+                '.settings-container',
+                '[id*="settings"]',
+                '[class*="settings"]'
+            ];
+            
+            let settingsPanel = null;
+            for (const selector of settingsSelectors) {
+                settingsPanel = document.querySelector(selector);
+                if (settingsPanel) {
+                    console.log('Found settings panel:', selector);
+                    break;
+                }
+            }
+            
+            // 如果找不到设置面板，尝试在聊天输入框附近添加按钮
+            if (!settingsPanel) {
+                // 尝试在聊天输入框上方或旁边添加按钮
+                const chatInput = document.querySelector('#send_textarea, textarea[placeholder*="输入"], .chat-input, [id*="input"]');
+                if (chatInput) {
+                    const inputContainer = chatInput.closest('.chat-input-container, .input-container, .chat-container') || chatInput.parentElement;
+                    if (inputContainer) {
+                        // 在输入框上方添加按钮
+                        const buttonContainer = document.createElement('div');
+                        buttonContainer.id = 'pixel-pet-button-container';
+                        buttonContainer.style.cssText = 'padding: 8px; text-align: center;';
+                        inputContainer.insertBefore(buttonContainer, chatInput);
+                        settingsPanel = buttonContainer;
+                    }
+                }
+            }
+            
+            // 如果还是找不到，在body顶部添加一个浮动按钮
+            if (!settingsPanel) {
+                const floatingButton = document.createElement('button');
+                floatingButton.id = 'pixel-pet-floating-btn';
+                floatingButton.innerHTML = '🐾 召唤宠物';
+                floatingButton.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 10000;
+                    padding: 10px 15px;
+                    background: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                `;
+                floatingButton.onclick = function() {
+                    showBall();
+                    openPetWindow();
+                };
+                document.body.appendChild(floatingButton);
+                console.log('Added floating button');
+                return true;
+            }
+            
+            // 在设置面板中添加按钮
+            if (settingsPanel && !document.getElementById('pixel-pet-settings-btn')) {
+                const button = document.createElement('button');
+                button.id = 'pixel-pet-settings-btn';
+                button.innerHTML = '🐾 召唤宠物';
+                button.className = 'pixel-pet-settings-button';
+                button.onclick = function() {
+                    showBall();
+                    openPetWindow();
+                };
+                
+                // 尝试找到合适的位置插入按钮
+                const firstChild = settingsPanel.firstElementChild;
+                if (firstChild) {
+                    settingsPanel.insertBefore(button, firstChild);
+                } else {
+                    settingsPanel.appendChild(button);
+                }
+                
+                console.log('Added settings button');
+                return true;
+            }
+            
+            return false;
+        }
         
-        try {
-            // 方法1: 尝试直接执行命令字符串（最可能有效的方法）
-            if (window.slash_commands) {
-                // 检查是否有执行命令的方法
-                const methods = ['execute', 'run', 'handleCommand', 'executeCommand', 'runSlashCommand', 'processCommand'];
-                for (const method of methods) {
-                    if (typeof window.slash_commands[method] === 'function') {
-                        console.log(`Trying method: ${method}`);
-                        try {
-                            // 执行创建QR集的命令
-                            window.slash_commands[method](`/qr-set-create ${QR_SET_NAME}`);
-                            setTimeout(() => {
-                                // 执行创建QR按钮的命令
-                                window.slash_commands[method](`/qr-create set="${QR_SET_NAME}" label="${QR_BUTTON_LABEL}" /pixelpet`);
-                                console.log(`Pixel Pet QR button created via ${method} method.`);
-                            }, 500);
-                            return true;
-                        } catch (e) {
-                            console.warn(`Method ${method} failed:`, e);
-                        }
-                    }
+        // 多次尝试，直到找到设置面板
+        let attempts = 0;
+        const maxAttempts = 20;
+        const interval = setInterval(() => {
+            if (tryAddButton() || attempts >= maxAttempts) {
+                clearInterval(interval);
+                if (attempts >= maxAttempts) {
+                    console.warn('Could not find settings panel, using floating button');
+                    tryAddButton(); // 最后一次尝试，会创建浮动按钮
                 }
             }
-            
-            // 方法2: 尝试通过QR Manager API
-            const qrManager = window.quickReplyManager || window.quick_reply_manager;
-            if (qrManager) {
-                console.log('Trying QR Manager API...');
-                if (qrManager.createSet && qrManager.createButton) {
-                    try {
-                        qrManager.createSet(QR_SET_NAME, {
-                            nosend: false,
-                            before: false,
-                            inject: false
-                        });
-                        setTimeout(() => {
-                            qrManager.createButton(QR_SET_NAME, {
-                                label: QR_BUTTON_LABEL,
-                                text: '/pixelpet'
-                            });
-                            console.log("Pixel Pet QR button created via QR Manager API.");
-                        }, 300);
-                        return true;
-                    } catch (e) {
-                        console.warn('QR Manager API failed:', e);
-                    }
-                }
-            }
-            
-            // 如果所有方法都失败，给出提示
-            console.error("❌ 无法自动创建QR按钮！");
-            console.warn("请手动在ST的聊天框中执行以下命令来创建QR按钮：");
-            console.warn(`1. /qr-set-create ${QR_SET_NAME}`);
-            console.warn(`2. /qr-create set="${QR_SET_NAME}" label="${QR_BUTTON_LABEL}" /pixelpet`);
-            return false;
-        } catch (e) {
-            console.error("创建QR按钮时出错:", e);
-            console.warn("请手动在ST的聊天框中执行以下命令：");
-            console.warn(`1. /qr-set-create ${QR_SET_NAME}`);
-            console.warn(`2. /qr-create set="${QR_SET_NAME}" label="${QR_BUTTON_LABEL}" /pixelpet`);
-            return false;
-        }
+            attempts++;
+        }, 500);
     }
     
-    // 延迟执行以确保酒馆系统加载完毕
-    // 尝试多次，因为系统可能加载较慢
-    let retryCount = 0;
-    const maxRetries = 15;
-    const retryInterval = 500;
-    
-    function tryCreateQRButton() {
-        // 检查必要的对象是否已加载
-        if (window.slash_commands || window.quickReplyManager || window.quick_reply_manager || window.eventSource) {
-            createQRButton();
-        } else if (retryCount < maxRetries) {
-            retryCount++;
-            setTimeout(tryCreateQRButton, retryInterval);
-        } else {
-            console.warn("多次尝试后仍无法创建QR按钮。请手动在ST中执行以下命令：");
-            console.warn(`1. /qr-set-create ${QR_SET_NAME}`);
-            console.warn(`2. /qr-create set="${QR_SET_NAME}" label="${QR_BUTTON_LABEL}" /pixelpet`);
-        }
-    }
-    
-    // 页面加载完成后开始尝试
-    setTimeout(tryCreateQRButton, 1500);
+    // 页面加载完成后添加按钮
+    setTimeout(addSettingsButton, 2000);
 
     // ============================
     // 1. 注入 HTML (含遮罩层)
@@ -263,7 +275,9 @@ jQuery(document).ready(function () {
             isLongPress = true;
             hideBall();
             // 提示用户
-            toastr.info(`宠物已隐藏，点击 QR 栏的【${QR_BUTTON_LABEL}】可召回。`);
+            if (typeof toastr !== 'undefined') {
+                toastr.info('宠物已隐藏，点击设置中的【召唤宠物】按钮可召回。');
+            }
         }, 800);
     });
 
