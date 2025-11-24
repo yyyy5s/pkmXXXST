@@ -1,4 +1,4 @@
-/* 悬浮球：Top 定位 + 强制层级 */
+/* 悬浮球 */
 #pixel-pet-float-btn {
     position: fixed !important;
     top: 150px;
@@ -16,7 +16,7 @@
     backdrop-filter: blur(4px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     user-select: none;
-    touch-action: none;
+    touch-action: none; /* 关键：禁止浏览器默认手势 */
     transition: transform 0.1s;
 }
 
@@ -37,30 +37,29 @@
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(3px);
+    -webkit-overflow-scrolling: touch; /* iOS 滚动优化 */
 }
 
-/* 窗口容器：强制尺寸 + 隐藏溢出 */
+/* 窗口容器 */
 #pixel-pet-container {
     width: 375px;
     height: 667px;
-    /* 适配小屏：不超过屏幕的 90% */
     max-width: 90vw; 
     max-height: 90vh;
     background: #000;
     border-radius: 20px;
     box-shadow: 0 0 20px rgba(0,0,0,0.8);
     position: relative;
-    
-    /* 核心修改：强制隐藏滚动条，超出部分直接剪裁 */
     overflow: hidden !important; 
+    /* 修复 iOS 上 iframe 可能溢出容器的问题 */
+    transform: translateZ(0); 
 }
 
-/* iframe：填满 + 强制不滚动 */
+/* iframe 样式 */
 #pixel-pet-iframe {
     width: 100%;
     height: 100%;
     border: none;
     display: block;
-    background: transparent;
-    overflow: hidden !important; /* 双重保险 */
+    background: #fff; /* 给个背景色，防止加载时透明 */
 }
