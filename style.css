@@ -1,31 +1,39 @@
-/* 悬浮球样式 - 修复手机端显示问题 */
+/* 悬浮球样式 - 使用emoji配半透明底色，PC端显示 */
 #floating-webview-ball {
     position: fixed !important;
     bottom: 20px !important;
     right: 20px !important;
-    width: 45px !important;  /* 稍微改小了一点 (原50) */
-    height: 45px !important;
-    /* 你的图片直链 */
-    background-image: url('https://raw.githubusercontent.com/yyyy5s/pkmXXXX/39fda8ff4519b6b570b9fd2696e67ad21cae730b/assets/icon.png') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    /* 圆角，不是纯圆 */
-    border-radius: 12px !important; 
-    /* 一点点阴影 */
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.4) !important;
+    width: 50px !important;
+    height: 50px !important;
+    /* emoji样式 */
+    font-size: 28px !important;
+    line-height: 50px !important;
+    text-align: center !important;
+    /* 半透明背景 */
+    background-color: rgba(102, 126, 234, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    /* 圆角 */
+    border-radius: 50% !important; 
+    /* 阴影 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
     cursor: grab !important;
-    z-index: 999999 !important; /* 提高z-index确保在手机端也能显示 */
-    transition: transform 0.1s, opacity 0.3s !important;
+    z-index: 999999 !important;
+    transition: transform 0.1s, opacity 0.3s, background-color 0.3s !important;
     user-select: none !important;
     -webkit-user-select: none !important;
-    /* 确保在移动端可见 */
+    /* PC端显示 */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    /* 移动端触摸优化 */
+    /* 触摸优化 */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
+}
+
+#floating-webview-ball:hover {
+    background-color: rgba(102, 126, 234, 0.9) !important;
+    transform: scale(1.1) !important;
 }
 
 #floating-webview-ball:active {
@@ -33,52 +41,50 @@
     transform: scale(0.95);
 }
 
-/* 弹窗容器样式 - 自适应尺寸，匹配网站期望的尺寸 */
+/* 弹窗容器样式 - 自适应尺寸，居中显示 */
 #floating-webview-container {
     display: none; /* 默认隐藏 */
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 390px;  /* 匹配网站默认宽度 */
-    height: 844px; /* 匹配网站默认高度 */
-    max-width: 90vw;  /* 响应式：最大不超过视口宽度的90% */
-    max-height: 90vh; /* 响应式：最大不超过视口高度的90% */
-    background: transparent;
-    /* 去掉明显的边框，显得更干净，或者保留细微边框 */
-    /* border: 1px solid #444; */
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    z-index: 20001;
-    overflow: hidden;
-    border-radius: 15px; /* 窗口也加点圆角 */
-}
-
-/* iframe 填满容器，使用缩放确保内容填满 */
-#floating-webview-iframe {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
+    /* 使用flexbox居中 */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 20001;
+    pointer-events: none; /* 允许点击遮罩层关闭 */
+}
+
+/* 当显示时使用flexbox */
+#floating-webview-container[style*="display: block"],
+#floating-webview-container[style*="display:flex"],
+#floating-webview-container:not([style*="display: none"]) {
+    display: flex !important;
+    pointer-events: auto;
+}
+
+/* iframe 自适应尺寸，居中显示 */
+#floating-webview-iframe {
+    width: 390px;  /* 匹配网站默认宽度 */
+    height: 844px; /* 匹配网站默认高度 */
+    max-width: calc(100vw - 40px);  /* 响应式：减去padding */
+    max-height: calc(100vh - 40px); /* 响应式：减去padding */
     border: none;
     background: #fff;
     pointer-events: auto;
-    /* 确保iframe内容能够正确显示 */
     display: block;
-    /* 移除默认的iframe间距 */
     margin: 0;
     padding: 0;
-    /* 确保iframe内容能够填满容器 */
-    object-fit: fill;
-    /* 移除iframe的默认缩放限制 */
-    zoom: 1;
-    -webkit-transform: scale(1);
-    transform: scale(1);
-}
-
-/* 如果iframe内容无法填满，尝试通过CSS注入来调整 */
-/* 注意：这需要iframe内容允许样式注入，或者通过JavaScript动态注入 */
-#floating-webview-container iframe {
-    /* 确保iframe本身填满容器 */
-    min-width: 100%;
-    min-height: 100%;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    /* 保持宽高比 */
+    object-fit: contain;
 }
 
 /* 全屏遮罩层：用于点击外部关闭 */
@@ -149,13 +155,59 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
 }
 
+/* 输入框按钮样式 */
+#pixel-pet-input-btn,
+.pixel-pet-input-button {
+    min-width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    margin: 0 4px !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+    border: 1px solid rgba(102, 126, 234, 0.3) !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 20px !important;
+    line-height: 36px !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+#pixel-pet-input-btn:hover,
+.pixel-pet-input-button:hover {
+    background: rgba(102, 126, 234, 0.2) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    transform: scale(1.1) !important;
+}
+
+#pixel-pet-input-btn:active,
+.pixel-pet-input-button:active {
+    transform: scale(0.95) !important;
+    background: rgba(102, 126, 234, 0.3) !important;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
+    /* 手机端隐藏悬浮球 */
     #floating-webview-ball {
-        bottom: 80px !important; /* 在移动端稍微上移，避免被底部导航栏遮挡 */
-        right: 15px !important;
-        width: 50px !important;
-        height: 50px !important;
+        display: none !important;
+    }
+    
+    /* 手机端容器全屏居中 */
+    #floating-webview-container {
+        padding: 10px !important;
+    }
+    
+    #floating-webview-iframe {
+        max-width: calc(100vw - 20px) !important;
+        max-height: calc(100vh - 20px) !important;
+        width: auto !important;
+        height: auto !important;
+        /* 在移动端保持宽高比，但适应屏幕 */
+        aspect-ratio: 390 / 844;
     }
     
     #pixel-pet-floating-btn {
