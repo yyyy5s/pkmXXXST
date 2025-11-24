@@ -1,0 +1,65 @@
+#floating-webview-ball {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    /* 你可以在这里加 background-image: url('你的图片链接'); 来替换纯色背景 */
+    background: radial-gradient(circle at 30% 30%, #4facfe, #00f2fe);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: grab;
+    z-index: 20000;
+    transition: transform 0.1s;
+    user-select: none;
+}
+
+#floating-webview-ball:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+#floating-webview-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 390px;
+    height: 844px;
+    background: #000;
+    border: 2px solid #4facfe;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    z-index: 20001;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+#floating-webview-header {
+    height: 30px;
+    background: #222;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 10px;
+    cursor: default;
+}
+
+#floating-webview-close {
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+#floating-webview-close:hover {
+    color: #ff4d4d;
+}
+
+#floating-webview-iframe {
+    width: 390px;
+    height: 814px;
+    border: none;
+    background: #fff;
+}
